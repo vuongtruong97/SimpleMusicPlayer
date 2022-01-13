@@ -7,20 +7,22 @@ const cd = $(".cd");
 const playBtn = $(".btn-toggle-play");
 const player = $(".player");
 const progressBar = $("#progress");
+const nextBtn = $(".btn-next");
+const prevBtn = $(".btn-prev");
 
 const app = {
   currentIndex: 0,
   isPlaying: false,
   songs: [
     {
-      name: "What Makes You Beautiful ",
-      singer: "One Direction",
+      name: "Reality ",
+      singer: "Lost Frequencies; Janieck Devy",
       path: "./assets/music/song1.mp3",
       image: "./assets/img/song1.jpg",
     },
     {
-      name: "Reality",
-      singer: "Lost Frequencies; Janieck Devy",
+      name: " What Makes You Beautiful",
+      singer: "One Direction",
       path: "./assets/music/song2.mp3",
       image: "./assets/img/song2.jpg",
     },
@@ -136,11 +138,32 @@ const app = {
       }
     };
     // When change value of progressBar
-    progressBar.onchange = function () {
-      const totalTime = audio.duration;
-      currentValue = progressBar.value;
-      console.log(totalTime);
-      audio.currentTime = (totalTime / 100) * currentValue;
+    progressBar.onchange = function (events) {
+      currentValue = events.target.value;
+      const seekTime = (audio.duration / 100) * currentValue;
+      audio.currentTime = seekTime;
+    };
+    // When click next Btn
+    nextBtn.onclick = function () {
+      player.classList.remove("playing");
+      _this.isPlaying = false;
+      _this.currentIndex += 1;
+      const playListLength = _this.songs.length;
+      if (_this.currentIndex === playListLength - 1) {
+        _this.currentIndex = 0;
+      }
+      _this.loadCurrentSong();
+    };
+    // When click Prev Btn
+    prevBtn.onclick = function () {
+      player.classList.remove("playing");
+      _this.isPlaying = false;
+      _this.currentIndex -= 1;
+      const playListLength = _this.songs.length;
+      if (_this.currentIndex < 0) {
+        _this.currentIndex = playListLength - 1;
+      }
+      _this.loadCurrentSong();
     };
   },
   loadCurrentSong: function () {
