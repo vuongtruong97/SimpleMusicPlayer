@@ -1,3 +1,14 @@
+//Render Songs
+//Scroll
+// play / pause / seek
+//CD rotate
+//Next, Prev
+//Random
+//Next, Repeat when end
+//Active song
+//Scroll active song into view
+//Play song when click
+
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 const heading = $("header h2");
@@ -9,10 +20,13 @@ const player = $(".player");
 const progressBar = $("#progress");
 const nextBtn = $(".btn-next");
 const prevBtn = $(".btn-prev");
-
+const randomBtn = $(".btn-random");
+const repeatBtn = $(".btn-repeat");
 const app = {
   currentIndex: 0,
   isPlaying: false,
+  isRandom: false,
+  isRepeat: false,
   songs: [
     {
       name: "Reality ",
@@ -103,6 +117,14 @@ const app = {
   },
   handleEvents: function () {
     const _this = this;
+    // Rotate the CD
+    var cdRotate = cdThumb.animate([{ transform: "rotate(360deg)" }], {
+      duration: 10000,
+      iterations: 10000000,
+    });
+    cdRotate.pause();
+
+    // Scroll Web
     cdWidth = cd.offsetWidth;
     document.onscroll = function () {
       var scroll = window.scrollY || document.documentElement.scrollTop;
@@ -110,6 +132,7 @@ const app = {
       cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
       cd.style.opacity = newCdWidth / cdWidth;
     };
+    // Play Btn
     playBtn.onclick = function () {
       if (_this.isPlaying) {
         audio.pause();
@@ -121,11 +144,13 @@ const app = {
     audio.onplay = function () {
       _this.isPlaying = true;
       player.classList.add("playing");
+      cdRotate.play();
     };
     // When song pause
     audio.onpause = function () {
       _this.isPlaying = false;
       player.classList.remove("playing");
+      cdRotate.pause();
     };
     // When song's time change
     audio.ontimeupdate = function () {
@@ -145,31 +170,94 @@ const app = {
     };
     // When click next Btn
     nextBtn.onclick = function () {
-      player.classList.remove("playing");
-      _this.isPlaying = false;
-      _this.currentIndex += 1;
-      const playListLength = _this.songs.length;
-      if (_this.currentIndex === playListLength - 1) {
-        _this.currentIndex = 0;
+      if (_this.isRepeat) {
+        _this.repeatSong();
+      } else {
+        if (_this.isRandom) {
+          _this.songRandomIndex();
+        }
+        _this.nextSong();
       }
-      _this.loadCurrentSong();
+      progressBar.value = 0;
+      // cdRotate.finish();
+      setTimeout(function () {
+        audio.play();
+      }, 700);
     };
     // When click Prev Btn
     prevBtn.onclick = function () {
-      player.classList.remove("playing");
-      _this.isPlaying = false;
-      _this.currentIndex -= 1;
-      const playListLength = _this.songs.length;
-      if (_this.currentIndex < 0) {
-        _this.currentIndex = playListLength - 1;
+      if (_this.isRepeat) {
+        _this.repeatSong();
+      } else {
+        if (_this.isRandom) {
+          _this.songRandomIndex();
+        }
+        _this.prevSong();
       }
-      _this.loadCurrentSong();
+
+      progressBar.value = 0;
+      setTimeout(function () {
+        audio.play();
+      }, 700);
+    };
+    // when click randomBtn
+    randomBtn.onclick = function () {
+      _this.isRandom = !_this.isRandom;
+      randomBtn.classList.toggle("active", _this.isRandom);
+    };
+    // on/off repeat Btn
+    repeatBtn.onclick = function () {
+      _this.isRepeat = !_this.isRepeat;
+      repeatBtn.classList.toggle("active", _this.isRepeat);
+    };
+    //When audio ended
+    audio.onended = function () {
+      if (_this.isRepeat) {
+        _this.repeatSong();
+      } else {
+        if (_this.isRandom) {
+          _this.songRandomIndex();
+          _this.nextSong();
+        }
+      }
+      progressBar.value = 0;
+      setTimeout(function () {
+        audio.play();
+      }, 1000);
     };
   },
   loadCurrentSong: function () {
     heading.innerText = this.currentSong.name;
     cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
     audio.src = this.currentSong.path;
+  },
+  nextSong: function () {
+    this.currentIndex++;
+    const playListLength = this.songs.length;
+    if (this.currentIndex >= playListLength) {
+      this.currentIndex = 0;
+    }
+    this.loadCurrentSong();
+  },
+  repeatSong: function () {
+    this.currentIndex = this.currentIndex;
+    this.loadCurrentSong();
+  },
+  prevSong: function () {
+    this.currentIndex--;
+    const playListLength = this.songs.length;
+    if (this.currentIndex < 0) {
+      this.currentIndex = playListLength - 1;
+    }
+    this.loadCurrentSong();
+  },
+  songRandomIndex: function () {
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * this.songs.length);
+    } while (randomIndex === this.currentIndex);
+    this.currentIndex = randomIndex;
+    this.loadCurrentSong();
   },
 
   start: function () {
@@ -183,7 +271,6 @@ const app = {
 
     // Render Playlist
     this.render();
-    console.log(this.currentSong);
   },
 };
 app.start();
