@@ -155,7 +155,7 @@ header h2 {
 
 /* PLAYLIST */
 .playlist {
-  margin-top: 404px;
+  margin-top: 444px;
   padding: 12px;
 }
 
@@ -239,4 +239,57 @@ header h2 {
 .option.active .option_menu {
   display: flex;
   flex-direction: row;
+}
+.song_timeLine {
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+}
+.song_timeLine .currentTime,
+.song_timeLine .total_time {
+  width: 60px;
+}
+.volumn {
+  display: flex;
+  align-items: center;
+  width: 300px;
+  padding: 0 16px;
+}
+.volumn i {
+  padding-right: 20px;
+  color: var(--primary-color);
+  width: 45px;
+  padding: 5px;
+  text-align: center;
+}
+.volume-btn {
+  display: block;
+}
+.mute-btn {
+  display: none;
+}
+.volumeBtn.active .volume-btn {
+  display: none;
+}
+.volumeBtn.active .mute-btn {
+  display: block;
+}
+.changeVolumn {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+}
+.changeVolumn::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  cursor: pointer;
 }

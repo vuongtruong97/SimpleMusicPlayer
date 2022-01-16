@@ -21,11 +21,17 @@ const cd = $(".cd");
 const playBtn = $(".btn-toggle-play");
 const player = $(".player");
 const progressBar = $("#progress");
+const volumnBar = $(".changeVolumn");
 const nextBtn = $(".btn-next");
 const prevBtn = $(".btn-prev");
 const randomBtn = $(".btn-random");
 const repeatBtn = $(".btn-repeat");
+const volumeBtn = $(".volumeBtn");
+const normalVolumnBtn = $(".volume-btn");
+const muteVolumeBtn = $(".mute-btn");
 const playList = $(".playlist");
+const currentSong = $(".currentTime");
+const showTotalTime = $(".total_time");
 // Play when onclick song with js inline render, global function:
 // function playCurrSong(index) {
 //   app.currentIndex = index;
@@ -39,6 +45,7 @@ const app = {
   isPlaying: false,
   isRandom: false,
   isRepeat: false,
+  isMute: false,
   configs: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)),
   setConfigs: function (key, value) {
     this.configs[key] = value;
@@ -185,11 +192,40 @@ const app = {
       const currentTime = audio.currentTime;
       const totalTime = audio.duration;
       currentPosition = (currentTime / totalTime) * 100;
-      currentPosition = Math.floor(currentPosition);
+      var timeCurrent = _this.formatSecondsAsTime(currentTime);
+      var timeTotal = _this.formatSecondsAsTime(totalTime);
+      currentSong.innerText = timeCurrent;
+      if (totalTime) {
+        showTotalTime.innerText = timeTotal;
+      }
+
       if (currentPosition) {
         progressBar.value = currentPosition;
       }
     };
+    // When change value of volumn bar
+    volumnBar.oninput = function (e) {
+      currentVol = Number(e.target.value);
+      audio.volume = currentVol;
+      volumeBtn.classList.remove("active");
+    };
+    // when click volume Btn
+    currentVol = audio.volume;
+    volumeBtn.onclick = function (e) {
+      if (_this.isMute) {
+        _this.isMute = !_this.isMute;
+        volumeBtn.classList.toggle("active", _this.isMute);
+        audio.volume = currentVol;
+        _this.setConfigs("isMute", _this.isMute);
+      } else {
+        _this.isMute = !_this.isMute;
+        _this.setConfigs("isMute", _this.isMute);
+        audio.volume = 0;
+
+        volumeBtn.classList.toggle("active");
+      }
+    };
+
     // When change value of progressBar
     progressBar.onchange = function (events) {
       currentValue = events.target.value;
@@ -232,6 +268,7 @@ const app = {
       _this.setConfigs("isRepeat", _this.isRepeat);
       repeatBtn.classList.toggle("active", _this.isRepeat);
     };
+
     //When audio ended
     audio.onended = function () {
       if (_this.isRepeat) {
@@ -273,6 +310,20 @@ const app = {
     heading.innerText = this.currentSong.name;
     cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
     audio.src = this.currentSong.path;
+  },
+  formatSecondsAsTime: function (secs, format) {
+    var hr = Math.floor(secs / 3600);
+    var min = Math.floor((secs - hr * 3600) / 60);
+    var sec = Math.floor(secs - hr * 3600 - min * 60);
+
+    if (min < 10) {
+      min = "0" + min;
+    }
+    if (sec < 10) {
+      sec = "0" + sec;
+    }
+
+    return min + ":" + sec;
   },
   nextSong: function () {
     this.currentIndex++;
@@ -332,8 +383,13 @@ const app = {
     this.isRandom = JSON.parse(
       localStorage.getItem(PLAYER_STORAGE_KEY)
     ).isRandom;
+    this.isMute = JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)).isMute;
     repeatBtn.classList.toggle("active", this.isRepeat);
     randomBtn.classList.toggle("active", this.isRandom);
+    volumeBtn.classList.toggle("active", this.isMute);
+    if (this.isMute) {
+      audio.volume = 0;
+    }
   },
 };
 app.start();
