@@ -134,7 +134,9 @@ const app = {
           <span class="option_item"><i class="fas fa-download"></i></span>
           </div>
           </div>
-          
+          <div class="spectrum">
+          <div></div>
+           </div>
         </div>
           `;
     });
@@ -180,11 +182,15 @@ const app = {
       _this.isPlaying = true;
       player.classList.add("playing");
       cdRotate.play();
+      $(".song.active .spectrum").classList.remove("paused");
+      $(".song.active .spectrum").classList.add("active");
     };
     // When song pause
     audio.onpause = function () {
       _this.isPlaying = false;
       player.classList.remove("playing");
+      $(".song.active .spectrum").classList.remove("active");
+      $(".song.active .spectrum").classList.add("paused");
       cdRotate.pause();
     };
     // When song's time change
