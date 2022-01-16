@@ -22,6 +22,15 @@ const nextBtn = $(".btn-next");
 const prevBtn = $(".btn-prev");
 const randomBtn = $(".btn-random");
 const repeatBtn = $(".btn-repeat");
+const playList = $(".playlist");
+// Play when onclick song with js inline render, global function:
+// function playCurrSong(index) {
+//   app.currentIndex = index;
+//   app.loadCurrentSong();
+//   app.render();
+//   audio.play();
+// }
+
 const app = {
   currentIndex: 0,
   isPlaying: false,
@@ -90,10 +99,11 @@ const app = {
     },
   ],
   render: function () {
-    var playList = $(".playlist");
-    var html = app.songs.map(function (song, index) {
+    const htmls = this.songs.map(function (song, index) {
       return `
-          <div class="song">
+          <div class="song ${
+            index === app.currentIndex ? "active" : ""
+          }" data-index="${index}">
           <div class="thumb" style="background-image: url('${song.image}')">
           </div>
           <div class="body">
@@ -106,7 +116,7 @@ const app = {
         </div>
           `;
     });
-    playList.innerHTML = html.join("");
+    playList.innerHTML = htmls.join("");
   },
   defineProperties: function () {
     Object.defineProperty(this, "currentSong", {
@@ -170,14 +180,11 @@ const app = {
     };
     // When click next Btn
     nextBtn.onclick = function () {
-      if (_this.isRepeat) {
-        _this.repeatSong();
-      } else {
-        if (_this.isRandom) {
-          _this.songRandomIndex();
-        }
-        _this.nextSong();
+      if (_this.isRandom) {
+        _this.songRandomIndex();
       }
+      _this.nextSong();
+
       progressBar.value = 0;
       // cdRotate.finish();
       setTimeout(function () {
@@ -186,15 +193,10 @@ const app = {
     };
     // When click Prev Btn
     prevBtn.onclick = function () {
-      if (_this.isRepeat) {
-        _this.repeatSong();
-      } else {
-        if (_this.isRandom) {
-          _this.songRandomIndex();
-        }
-        _this.prevSong();
+      if (_this.isRandom) {
+        _this.songRandomIndex();
       }
-
+      _this.prevSong();
       progressBar.value = 0;
       setTimeout(function () {
         audio.play();
@@ -217,13 +219,29 @@ const app = {
       } else {
         if (_this.isRandom) {
           _this.songRandomIndex();
-          _this.nextSong();
         }
+        _this.nextSong();
       }
       progressBar.value = 0;
       setTimeout(function () {
         audio.play();
       }, 1000);
+    };
+    // When click on playList
+    playList.onclick = function (events) {
+      console.log(_this.currentIndex);
+
+      if (
+        events.target.closest(".song:not(.active)") ||
+        events.target.closest(".song .option")
+      ) {
+        const targetSong = events.target.closest(".song");
+        _this.currentIndex = ~~targetSong.getAttribute("data-index"); // use ('~~','+','parseInt()','Number(),...to converse string to Number)
+        _this.loadCurrentSong();
+        console.log(_this.currentIndex);
+        _this.render();
+        audio.play();
+      }
     };
   },
   loadCurrentSong: function () {
@@ -238,6 +256,7 @@ const app = {
       this.currentIndex = 0;
     }
     this.loadCurrentSong();
+    this.scrollToActiveSong();
   },
   repeatSong: function () {
     this.currentIndex = this.currentIndex;
@@ -250,27 +269,37 @@ const app = {
       this.currentIndex = playListLength - 1;
     }
     this.loadCurrentSong();
+    this.scrollToActiveSong();
+  },
+  scrollToActiveSong: function () {
+    this.render();
+    const activeSong = $(".song.active");
+    setTimeout(function () {
+      activeSong.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "end",
+      });
+    }, 300);
   },
   songRandomIndex: function () {
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * this.songs.length);
-    } while (randomIndex === this.currentIndex);
+    } while (randomIndex === app.currentIndex);
     this.currentIndex = randomIndex;
     this.loadCurrentSong();
   },
 
   start: function () {
+    // Render Playlist
+    this.render();
     // Định nghĩa các thuộc tính cho Object
     this.defineProperties();
-
     // Lắng nghe và xử lý các sự kiện (DOM Events)
     this.handleEvents();
     // Tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
     this.loadCurrentSong();
-
-    // Render Playlist
-    this.render();
   },
 };
 app.start();

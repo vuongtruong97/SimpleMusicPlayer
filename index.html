@@ -22,8 +22,12 @@
       <div class="dashboard">
         <!-- Header -->
         <header>
-          <h4>Now playing:</h4>
-          <h2>String 57th & 9th</h2>
+          <div class="header_moreBtn"><i class="fas fa-chevron-down"></i></div>
+          <div class="header_songPlaying">
+            <h4>Now playing:</h4>
+            <h2>String 57th & 9th</h2>
+          </div>
+          <div class="header_addBtn"><i class="fas fa-plus"></i></div>
         </header>
 
         <!-- CD -->
@@ -65,6 +69,14 @@
           min="0"
           max="100"
         />
+        <div class="rating">
+          <div class="favourite-btn">
+            <i class="fas fa-heart"></i>
+          </div>
+          <div class="like-btn">
+            <i class="far fa-thumbs-down"></i>
+          </div>
+        </div>
 
         <audio id="audio" src=""></audio>
       </div>

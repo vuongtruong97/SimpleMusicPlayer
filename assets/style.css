@@ -22,6 +22,7 @@ html {
   position: relative;
   max-width: 480px;
   margin: 0 auto;
+  /* overflow: scroll; */
 }
 
 .player .icon-pause {
@@ -48,10 +49,18 @@ html {
 
 /* HEADER */
 header {
+  display: flex;
+  justify-content: space-between;
   text-align: center;
   margin-bottom: 10px;
 }
-
+.header_moreBtn,
+.header_addBtn {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  width: 40px;
+  height: 40px;
+}
 header h4 {
   color: var(--primary-color);
   font-size: 12px;
@@ -128,10 +137,24 @@ header h2 {
   background-color: var(--primary-color);
   cursor: pointer;
 }
+.rating {
+  display: flex;
+  justify-content: space-evenly;
+  padding-top: 7px;
+}
+.favourite-btn,
+.like-btn {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  opacity: 0.5;
+}
+.rating {
+  display: none;
+}
 
 /* PLAYLIST */
 .playlist {
-  margin-top: 408px;
+  margin-top: 404px;
   padding: 12px;
 }
 
