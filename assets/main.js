@@ -208,6 +208,7 @@ const app = {
       currentVol = Number(e.target.value);
       audio.volume = currentVol;
       volumeBtn.classList.remove("active");
+      _this.isMute = false;
     };
     // when click volume Btn
     currentVol = audio.volume;
@@ -219,10 +220,9 @@ const app = {
         _this.setConfigs("isMute", _this.isMute);
       } else {
         _this.isMute = !_this.isMute;
-        _this.setConfigs("isMute", _this.isMute);
         audio.volume = 0;
-
         volumeBtn.classList.toggle("active");
+        _this.setConfigs("isMute", _this.isMute);
       }
     };
 
@@ -259,14 +259,14 @@ const app = {
     // when click randomBtn
     randomBtn.onclick = function () {
       _this.isRandom = !_this.isRandom;
-      _this.setConfigs("isRandom", _this.isRandom);
       randomBtn.classList.toggle("active", _this.isRandom);
+      _this.setConfigs("isRandom", _this.isRandom);
     };
     // on/off repeat Btn
     repeatBtn.onclick = function () {
       _this.isRepeat = !_this.isRepeat;
-      _this.setConfigs("isRepeat", _this.isRepeat);
       repeatBtn.classList.toggle("active", _this.isRepeat);
+      _this.setConfigs("isRepeat", _this.isRepeat);
     };
 
     //When audio ended
@@ -362,8 +362,11 @@ const app = {
     let randomIndex;
     do {
       randomIndex = Math.floor(Math.random() * this.songs.length);
+      console.log(app.currentIndex);
     } while (randomIndex === app.currentIndex);
-    this.currentIndex = randomIndex;
+    console.log(app.currentIndex);
+
+    app.currentIndex = randomIndex;
     this.loadCurrentSong();
   },
 
