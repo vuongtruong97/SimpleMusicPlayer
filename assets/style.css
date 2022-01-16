@@ -41,6 +41,7 @@ html {
   padding: 16px 16px 14px;
   background-color: #fff;
   position: fixed;
+  z-index: 999;
   top: 0;
   width: 100%;
   max-width: 480px;
@@ -209,4 +210,33 @@ header h2 {
   padding: 16px 8px;
   color: #999;
   font-size: 18px;
+  position: relative;
+}
+.option .option_menu {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.option_menu.active {
+  display: flex;
+}
+.option_menu span {
+  color: var(--primary-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1rem;
+  padding: 10px 15px;
+  background-color: #eee;
+}
+.option.active .option_menu {
+  display: flex;
+  flex-direction: row;
 }

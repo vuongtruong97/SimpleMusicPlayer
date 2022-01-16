@@ -11,6 +11,9 @@
 
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+
+const PLAYER_STORAGE_KEY = "Vuong_Player";
+
 const heading = $("header h2");
 const cdThumb = $(".cd-thumb");
 const audio = $("#audio");
@@ -36,6 +39,11 @@ const app = {
   isPlaying: false,
   isRandom: false,
   isRepeat: false,
+  configs: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)),
+  setConfigs: function (key, value) {
+    this.configs[key] = value;
+    localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.configs));
+  },
   songs: [
     {
       name: "Reality ",
@@ -98,6 +106,7 @@ const app = {
       image: "./assets/img/song10.jpg",
     },
   ],
+
   render: function () {
     const htmls = this.songs.map(function (song, index) {
       return `
@@ -112,7 +121,13 @@ const app = {
           </div>
           <div class="option">
             <i class="fas fa-ellipsis-h"></i>
+            <div class="option_menu">
+          <span class="option_item"><i class="far fa-thumbs-down"></i></span>
+          <span class="option_item"><i class="fas fa-heart"></i></span>
+          <span class="option_item"><i class="fas fa-download"></i></span>
           </div>
+          </div>
+          
         </div>
           `;
     });
@@ -141,6 +156,9 @@ const app = {
       var newCdWidth = cdWidth - scroll;
       cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
       cd.style.opacity = newCdWidth / cdWidth;
+      if ($(".option.active")) {
+        $(".option.active").classList.remove("active");
+      }
     };
     // Play Btn
     playBtn.onclick = function () {
@@ -205,11 +223,13 @@ const app = {
     // when click randomBtn
     randomBtn.onclick = function () {
       _this.isRandom = !_this.isRandom;
+      _this.setConfigs("isRandom", _this.isRandom);
       randomBtn.classList.toggle("active", _this.isRandom);
     };
     // on/off repeat Btn
     repeatBtn.onclick = function () {
       _this.isRepeat = !_this.isRepeat;
+      _this.setConfigs("isRepeat", _this.isRepeat);
       repeatBtn.classList.toggle("active", _this.isRepeat);
     };
     //When audio ended
@@ -229,18 +249,23 @@ const app = {
     };
     // When click on playList
     playList.onclick = function (events) {
-      console.log(_this.currentIndex);
-
       if (
         events.target.closest(".song:not(.active)") ||
         events.target.closest(".song .option")
       ) {
-        const targetSong = events.target.closest(".song");
-        _this.currentIndex = ~~targetSong.getAttribute("data-index"); // use ('~~','+','parseInt()','Number(),...to converse string to Number)
-        _this.loadCurrentSong();
-        console.log(_this.currentIndex);
-        _this.render();
-        audio.play();
+        // click on option
+        if (events.target.closest(".option")) {
+          const optionMenu = events.target.closest(".option");
+          optionMenu.classList.toggle("active");
+        }
+        // Click on song div
+        else if (events.target.closest(".song:not(.active)")) {
+          const targetSong = events.target.closest(".song");
+          _this.currentIndex = ~~targetSong.dataset.index; // use ('~~','+','parseInt()','Number(),...to converse string to Number)
+          _this.loadCurrentSong();
+          _this.render();
+          audio.play();
+        }
       }
     };
   },
@@ -300,6 +325,15 @@ const app = {
     this.handleEvents();
     // Tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
     this.loadCurrentSong();
+    //load Setting configs
+    this.isRepeat = JSON.parse(
+      localStorage.getItem(PLAYER_STORAGE_KEY)
+    ).isRepeat;
+    this.isRandom = JSON.parse(
+      localStorage.getItem(PLAYER_STORAGE_KEY)
+    ).isRandom;
+    repeatBtn.classList.toggle("active", this.isRepeat);
+    randomBtn.classList.toggle("active", this.isRandom);
   },
 };
 app.start();
